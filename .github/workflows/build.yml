@@ -1,4 +1,4 @@
-name: Build Single C# File
+name: Build WinForms Project
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
 
 jobs:
   build:
-    # Возвращаемся на быстрый Linux-сервер
-    runs-on: ubuntu-latest
+    # Обязательно используем Windows для сборки графических интерфейсов Windows Forms
+    runs-on: windows-latest
 
     steps:
       # 1. Скачиваем ваш .cs файл из репозитория
@@ -22,10 +22,16 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # 3. Автоматически создаем пустой файл проекта рядом с вашим кодом
-      - name: Create temporary project file
-        run: dotnet new console --force
+      # 3. Автоматически создаем пустой проект Windows Forms
+      - name: Create WinForms project file
+        run: dotnet new winforms --force
 
-      # 4. Запускаем сборку
+      # 4. Удаляем автоматически сгенерированный шаблонный Form1.cs, чтобы он не конфликтовал с вашим файлом
+      - name: Clean template files
+        run: |
+          if (Test-Path Form1.cs) { Remove-Item Form1.cs }
+          if (Test-Path Form1.Designer.cs) { Remove-Item Form1.Designer.cs }
+
+      # 5. Запускаем сборку
       - name: Build project
         run: dotnet build --configuration Release
