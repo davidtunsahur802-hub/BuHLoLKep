@@ -8,16 +8,24 @@ on:
 
 jobs:
   build:
-    # Используем Windows, так как на ней компилятор csc доступен из коробки
-    runs-on: windows-latest
+    # Возвращаемся на быстрый Linux-сервер
+    runs-on: ubuntu-latest
 
     steps:
+      # 1. Скачиваем ваш .cs файл из репозитория
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v2
+      # 2. Устанавливаем официальный .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
-      - name: Compile C# File
-        # Замените gemini-code-1791575743889.cs на точное имя файла, если оно другое
-        run: csc gemini-code-1791575743889.cs
+      # 3. Автоматически создаем пустой файл проекта рядом с вашим кодом
+      - name: Create temporary project file
+        run: dotnet new console --force
+
+      # 4. Запускаем сборку
+      - name: Build project
+        run: dotnet build --configuration Release
