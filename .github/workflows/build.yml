@@ -1,4 +1,4 @@
-name: Build C# Project
+name: Build Single C# File
 
 on:
   push:
@@ -8,23 +8,16 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Используем Windows, так как на ней компилятор csc доступен из коробки
+    runs-on: windows-latest
 
     steps:
-      # 1. Скачиваем код из репозитория
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Устанавливаем .NET SDK (версию 8.0 или нужную вам)
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
 
-      # 3. Восстанавливаем зависимости (NuGet пакеты)
-      - name: Restore dependencies
-        run: dotnet restore
-
-      # 4. Собираем проект в режиме Release
-      - name: Build project
-        run: dotnet build --configuration Release --no-restore
+      - name: Compile C# File
+        # Замените gemini-code-1791575743889.cs на точное имя файла, если оно другое
+        run: csc gemini-code-1791575743889.cs
